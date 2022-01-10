@@ -4,18 +4,19 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">  
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/style.css')}}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Document</title>
+    <title>Budgetpal</title>
 </head>
-<body>
+<body id="index-body">
     <!-- NAVBAR START -->
     <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-        <a class="navbar-brand" href="/">Budget<span style="color:rgb(56, 133, 196)">pal</span></a>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <a class="navbar-brand" href="/">Budget<span class="your-blue-now">pal</span></a>
+        <div class="collapse navbar-collapse" id="navContent">
           <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-              <a class="nav-link" href="#">About<span class="sr-only">(current)</span></a>
+              <a class="nav-link" href="#">Login<span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item"><a class="nav-link" href="#">Links</a></li>
           </ul>
@@ -35,11 +36,16 @@
             <div class="col-3">
 
             </div>
-            <div class="col-6">
-              <a href="/register" class="btn btn-link btn-outline-dark d-block mx-auto"
-              aria-expanded="false" aria-controls="collapseExample">
+            <div class="col-6 align-items-center d-flex justify-content-center">
+              <a href="/register" class="btn btn-link btn-outline-dark d-block mx-auto" id="boringText">
               Not a user yet? Click here to get get started!
               </a>
+              <!-- GUEST LOGIN FORM -->
+                  <form class="form" action="/login" method="post">
+                        <input type="hidden" class="form-control mr-sm-2"  value="Guest" name="username">
+                        <input class="form-control mr-sm-2" type="hidden" name="pass" value="guestpassword1">
+                        <button class="btn btn-outline-dark my-2 my-sm-0 blueHover" type="submit">Or CLICK HERE to login as Guest</button>
+                  </form>
             </div>
             <div class="col-3">
               {% with messages = get_flashed_messages(category_filter=["login"]) %}  
@@ -80,10 +86,10 @@
               <!-- Nav component -->
               <ul class="nav justify-content-center">
                 <li class="nav-item">
-                  <a class="nav-link" href="#">Contact us</a></li>
+                  <a class="nav-link" target="_blank" href="https://github.com/KNJour/budgetpal">See the Code</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Eat a banana</a></li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#">A Website by Keith Journell</a>
+                  <a class="nav-link" target="_blank" href="www.keithjournell.com">A Website by Keith Journell</a>
                 </li>
               </ul>
               <!-- End of Nav Component -->

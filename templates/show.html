@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ url_for('static', filename='CSS/style.css')}}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Details</title>
 </head>
 <body>
     <!-- NAVBAR START -->
@@ -28,15 +28,14 @@
           </form>
       </nav>
       <!-- NAVBAR END -->
-      <div class="container-fluid mt-2 mb-2">
-          <div class="row h1">
-                <div class="col-12 bg-dark text-white justify-content-center">
-                  <h2>My Budgets</h2>
+      <div class="container-fluid mb-2">
+          <div class="row">
+                <div class="col-12 text-white justify-content-center blue-background">
+                  <h2>Additional Details</h2>
                 </div>
           </div>
           <div class="row">
-          <div class="col-3"></div>
-            <div class="col-6"> 
+            <div class="container-fluid mt-1"> 
               {%for one_budget in budgets%}
               <div class="card card-heading bg-dark text-light text-center">
                 <h3>{{one_budget['budget_name']}}</h3>
@@ -51,8 +50,6 @@
                 <h2>{{status}}</h2>
               </div>
               {% endfor%}
-            </div>
-            <div class="col-3">
             </div>
           </div>
           <div class="row">
