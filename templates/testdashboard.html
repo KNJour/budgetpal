@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">  
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/style.css')}}">
+    <title>Dashboard</title>
+</head>
+<body>
+    <!-- NAVBAR START -->
+    <nav class="navbar navbar-expand-sm ">
+        <a class="navbar-brand" href="#">Budget<span class="your-blue-now">pal</span></a>
+        <div class="collapse navbar-collapse" id="navContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Dashboard<span class="sr-only">(current)</span></a>
+              </li>
+            <li class="nav-item ">
+              <a class="nav-link" href="#">About<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="#">Links</a></li>
+            <li class="nav-item"></li><a class="nav-link" href="/budgets">Edit Budgets</a></li>
+          </ul>
+        </div>
+            <a class="btn btn-outline-light text-white my-2 my-sm-0" href="/logout" type="submit"><strong><span class="hover">Log</span><span style="color:red">out</span></strong></a>
+          </form>
+      </nav>
+      <!-- NAVBAR END -->
+      <div class="container-fluid mb-2 budget-contain">
+          <div class="row">
+                <div class="col-12 blue-background text-white r">
+                  <h2>Your Budgets</h2>
+                </div>
+                <div class="gradientRow"></div>
+          </div>
+          <div class="row budgetSlideRow">
+              <div class="col-12 col-md-6 budgetslide-container mt-2 roundMe"> 
+                <div id="indicator" class="carousel slide mt-2" data-ride="carousel">
+                  <div class="carousel-inner">
+                      <div class=" card carousel-item active">
+                          {%for one_budget in first %}
+                          <div class="card-heading">
+                              <div class="header-wrapper">
+                                <h2><a href="show/{{one_budget['id']}}" class="budget-link">{{one_budget['budget_name']}}</a></h2>
+                              </div>
+                          </div>
+                          <div class="card-body bg-light text-dark text-center">
+                            <h1>${{one_budget['adj_balance']}}</h1>
+                            <h3>remaining</h3>
+                            <h6><a href="show/{{one_budget['id']}}"class="additional-details mt-2">click for additional details</a></h6>
+                          </div>
+                          <div class="hiddenMobile d-none d-md-block">
+                            <div class="card-footer">
+                                <h3>log expense:</h3>
+                                <form class="form form-inline" action="/update_budget" method="post">
+                                    <label for="amount">$ </label>
+                                    <input class="form-control form-inline" type="text" name="amount" placeholder="payment amount"/>
+                                    <input type="hidden" name="budget_id" value="{{one_budget['id']}}"/>
+                                    <button class="btn btn-primary" type="submit">Log</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="hiddenBig d-md-none">
+                            <div class="card-footer">
+                              <h3>log expense:</h3>
+                                    <form class="form logForm" action="/update_budget" method="post">
+                                        <label for="amount">$</label>
+                                         <input class="form-control m-1 align-self-center " type="text" name="amount" placeholder="payment amount">
+                                        <input class=" align-self-center" type="hidden" name="budget_id" value="{{one_budget['id']}}">
+                                         <button class="btn btn-primary align-self-center " type="submit">Log</button>
+                                     </form>
+                                </div>
+                            </div>
+                        {% with messages = get_flashed_messages() %}  
+                            {% if messages %}   
+                            {% for message in messages %}
+                            <p class="text-danger">{{message}}</p>       
+                            {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        {% endfor%}
+                      </div>
+                      <!-- ALL SLIDES EXCEPT THE FIRST -->
+                          {%for one_budget in budgets%}
+                          <div class="card carousel-item">
+                            <div class="card-heading">
+                                <div class="header-wrapper">
+                                    <h3><a href="show/{{one_budget['id']}}" class="budget-link">{{one_budget['budget_name']}}</a></h3>
+                                </div>
+                            </div>
+                          <div class="card-body bg-light text-dark text-center">
+                            <h1>${{one_budget['adj_balance']}}</h1>
+                            <h3>remaining</h3>
+                            <h6><a href="show/{{one_budget['id']}}"class="additional-details mt-2">click for additional details</a></h6>
+                          </div>
+                          <div class="hiddenSmall d-none d-md-block">
+                          <div class="card-footer">
+                            <h3>log expense:</h3>
+                                  <form class="form logForm" action="/update_budget" method="post">
+                                      <label for="amount">$ </label>
+                                       <input class="form-control mr-sm-2 align-self-center " type="text" name="amount" placeholder="payment amount">
+                                      <input class=" align-self-center" type="hidden" name="budget_id" value="{{one_budget['id']}}">
+                                       <button class="btn btn-primary align-self-center " type="submit">Log</button>
+                                   </form>
+                              </div>
+                          </div>
+                          <div class="hiddenBig d-md-none">
+                            <div class="card-footer">
+                              <h3>log expense:</h3>
+                                    <form class="form logForm" action="/update_budget" method="post">
+                                        <label for="amount">$ </label>
+                                         <input class="form-control mr-sm-2 align-self-center " type="text" name="amount" placeholder="payment amount">
+                                        <input class=" align-self-center" type="hidden" name="budget_id" value="{{one_budget['id']}}">
+                                         <button class="btn btn-primary align-self-center " type="submit">Log</button>
+                                     </form>
+                                </div>
+                            </div>
+                          {% with messages = get_flashed_messages() %}  
+                          {% if messages %}   
+                          {% for message in messages %}
+                          <p class="text-danger">{{message}}</p>       
+                          {% endfor %}
+                          {% endif %}
+                        {% endwith %}
+                      </div>
+                          {% endfor%}
+                      
+                  </div>
+                  <a class="carousel-control-prev" href="#indicator" role="button" data-slide="prev">
+                      <span class="carousel-control-prev-icon carouselStyle" aria-hidden="true"></span>
+                      <span class="sr-only">Previous</span>
+                  </a>
+                  <a class="carousel-control-next" href="#indicator" role="button" data-slide="next">
+                      <span class="carousel-control-next-icon carouselStyle" aria-hidden="true"></span>
+                      <span class="sr-only">Next</span>
+                  </a>
+              </div>
+         </div>
+    </div>
+    <!-- TABLE ROW START  -->
+    <div class="row budgetTableRow">
+        <div class="col-12">
+            <table class="table table-light table-striped text-dark budgetsTable text-center m-1">
+                <thead class="table-head tableRow">
+                    <th class="tableItem">Delete</th>
+                    <th class="tableItem">Budget Name</th>
+                    <th class="tableItem">Remaining Balance</th>
+                    <th class="tableItem">Start Date</th>
+                    <th class="tableItem">End Date</th>
+                    <th class="tableItem" id="logpmt">Log Payment</th>
+                    <th class="tableItem">Additional Details</th>
+                </thead>
+                {%for one_budget in all_budgets %}
+                <tbody>
+                    <tr class="tableRow">
+                        <form action="/delete" method="post">
+                            <td><input type="hidden" name="budget_id" value="{{one_budget['id']}}"><input type="submit" value="delete" class="btn btn-danger btn-outline-light"></td>
+                        </form>
+                        <td class="tableItem"><h5>{{one_budget['budget_name']}}</h5></td>
+                        <td class="tableItem">${{one_budget['adj_balance']}}</td>
+                        <td class="tableItem">{{one_budget['start_date']}}</td>
+                        <td class="tableItem">{{one_budget['target_date']}}</td>
+                        <td class="tableItem" id="logpmt">
+                                        <form class="form logForm" action="/update_budget" method="post">
+                                            <label for="amount">$</label>
+                                            <input class="form-control m-1 " type="text" name="amount" placeholder="payment">
+                                            <input class=" align-self-center" type="hidden" name="budget_id" value="{{one_budget['id']}}">
+                                            <button class="btn btn-primary " type="submit">Log</button>
+                                        </form>
+                        </td>
+                        <td><a href="show/{{one_budget['id']}}" class="btn btn-success btn-outline-light text-light">Info</a></td>
+                    </tr>
+                </tbody>
+                {% endfor %}
+                
+            </table>
+        </div>
+    </div>
+        </div>
+        <footer class="page-footer">
+          <ul class="nav justify-content-center">
+            <li class="nav-item">
+              <a class="nav-link" target="_blank" href="https://github.com/KNJour/budgetpal">See the Code</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Eat a banana</a></li>
+            <li class="nav-item">
+              <a class="nav-link" target="_blank" href="keithjournell.com">A project by Keith Journell</a>
+            </li>
+          </ul>
+          </footer>
+        </div>
+      <script src="{{ url_for('static', filename='scripts/script.js')}}"></script>
+</body>
+</html>

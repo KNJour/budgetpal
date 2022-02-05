@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, session, flash
 from datetime import datetime
 from datetime import date
 from mysqlconnection import connectToMySQL
+from decimal import Decimal
 from flask_bcrypt import Bcrypt
 import re
 app = Flask(__name__)
@@ -79,14 +80,14 @@ def submit():
         
         return redirect ('/')
 # THIS VALIDATES BUDGET
-def validate_mag(budget):
+def validate_budget(budget):
     is_valid = True
-    if len(magazine['title']) <2:
+    if len(budget['title']) <2:
         is_valid = False
         flash("Title must be at least 2 characters")
-    if len(magazine['description']) <10:
+    if len(budget['description']) < 2:
         is_valid = False
-        flash("Description must be at least 10 characters")
+        flash("Description must be at least 2 characters")
     return is_valid
 
 #validates user after creation
@@ -143,7 +144,6 @@ def login():
     data = {
         'check' : request.form['username'].lower()
     }
-    print("it ISSSSSS" + request.form['username'])
     hashme = request.form['pass']
     print(request.form['username'].lower())
     print(hashme)
@@ -200,22 +200,26 @@ def dashboard():
         print("NOT IN SESSION")
         return redirect('/')
     queryFirst = "SELECT * FROM budgets WHERE budgets.user_id =%(user_id)s LIMIT 1;"
-    ogquery = "SELECT balance FROM budgets WHERE user_id = %(user_id)s;"
+    all_budgets_query = "SELECT * FROM budgets WHERE user_id = %(user_id)s;"
     data = {
         "user_id": session['user_id'],
     }
-    balances = connectToMySQL('budgets').query_db(ogquery,data)
+    all_budgets = connectToMySQL('budgets').query_db(all_budgets_query,data)
     firstBudget = connectToMySQL('budgets').query_db(queryFirst,data)
+    print("all_budgets HERE")
+    print(all_budgets)
     if len(firstBudget) < 1:
         return render_template("dashboard.html")
     data2 = {
         "user_id": session['user_id'],
         "first" : firstBudget[0]['id']
     }
+    # queries everything except the first budget 
     query = "SELECT * FROM budgets WHERE budgets.user_id = %(user_id)s AND budgets.id != %(first)s ;"
     budgets = connectToMySQL('budgets').query_db(query,data2)
     print(budgets)
-    return render_template("dashboard.html", budgets = budgets, first = firstBudget)
+    # first contains the first budget for the carousel to operate correctly. budgets has the remainder, and all budgets has them all for the list on the bottom
+    return render_template("testdashboard.html", budgets = budgets, first = firstBudget, all_budgets = all_budgets)
 
 
 #goes to edit budgets page
@@ -243,7 +247,8 @@ def create_budget():
         'user_id' : session['user_id'],
     }
 
-    budgets = connectToMySQL('budgets').query_db(query,data)
+    new_budget = connectToMySQL('budgets').query_db(query,data)
+    print(new_budget)
     flash("budget successfully created!")
     return redirect("/budgets")
 
@@ -255,12 +260,19 @@ def update_budget():
     if not validate_pmt(request.form['amount']):
        return redirect ('/dashboard')
     query = "SELECT adj_balance FROM budgets WHERE budgets.id = %(budget_id)s;"
+
+    # QUERYLOGS THE PAYMENT INTO SPENDING TABLE
+    spendingQuery = "INSERT INTO spending (amount, timestamp, created_at, updated_at, budgets_id) VALUES (%(payment_amount)s, NOW(), NOW(), NOW(), %(budget_id)s);"
+
     data = {
-        'budget_id' : request.form['budget_id']
+        'budget_id' : request.form['budget_id'],
+        'payment_amount' : request.form['amount']
     }
     current_balance = connectToMySQL("budgets").query_db(query,data)
-    print("HEEEEEEERE")
-    newAmount = round(int(current_balance[0]['adj_balance']) - int(request.form['amount']), 2)
+    logSpending = connectToMySQL("budgets").query_db(spendingQuery, data)
+
+    # newAmount = round(int(current_balance[0]['adj_balance']) - int(request.form['amount']), 2)
+    newAmount = Decimal(current_balance[0]['adj_balance']) - Decimal(request.form['amount'])
     print(newAmount)
 
     adjust = "UPDATE budgets SET adj_balance = %(newAmount)s WHERE budgets.id = %(budget_id)s;"
@@ -268,6 +280,7 @@ def update_budget():
         'budget_id' : request.form['budget_id'],
         'newAmount' : newAmount
     }
+
     new = connectToMySQL("budgets").query_db(adjust,data2)
 
     return redirect("/dashboard")
@@ -281,11 +294,16 @@ def show(budget_id):
     data = {
         "budget_id": budget_id
     }
+
     query = "SELECT * FROM budgets WHERE budgets.id =%(budget_id)s;"
+    spending_query = "SELECT * FROM spending WHERE budgets_id =%(budget_id)s;"
 
     budgets = connectToMySQL('budgets').query_db(query,data)
-    print(budgets)
-    print("heeeeeeEEEEEERRREE")
+    spending = connectToMySQL('budgets').query_db(spending_query, data)
+    print("SPENDING CHECK")
+    print(spending)
+
+
     percentRemaining = round(int(budgets[0]['adj_balance']) / int(budgets[0]['balance']) * 100, 2)
 
     #dates
@@ -295,7 +313,6 @@ def show(budget_id):
     duration = date_difference(date2, date1)
     currentDiff = date_difference(date3, date1)
 
-    print("here goes")
     print(duration)
     print(currentDiff)
     dateRemaining = round(currentDiff / duration * 100, 2)
@@ -306,15 +323,17 @@ def show(budget_id):
         status = "Good job! You are on track!"
     else:
         status = "You are not on track"
-    return render_template("show.html", budgets = budgets, percentRemaining = percentRemaining, dateRemaining = dateRemaining, status = status)
+    return render_template("show.html", budgets = budgets, percentRemaining = percentRemaining, dateRemaining = dateRemaining, status = status, spending = spending)
 
 #DELETE BUDGET
 @app.route('/delete', methods=['POST'])
 def delete():
+    spending_query = "DELETE FROM spending WHERE budgets_id = %(id)s"
     query = "DELETE FROM budgets WHERE budgets.id = %(id)s;"
     data = {
         'id': request.form['budget_id']
     }
+    spending_deleted = connectToMySQL('budgets').query_db(spending_query,data)
     deleted = connectToMySQL('budgets').query_db(query,data)
     return redirect('/budgets')
 
