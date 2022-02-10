@@ -143,42 +143,73 @@
               </div>
          </div>
     </div>
-    <!-- TABLE ROW START  -->
-    <div class="row budgetTableRow">
-        <div class="col-12">
-            <table class="table table-light table-striped text-dark budgetsTable text-center m-1">
+    <!-- TABLE ROW START MD SCREEN TABLE -->
+    <div class="row budgetTableRow d-none d-md-block p-0  mt-5">
+        <div class="col-12 pl-0 pr-0">
+            <table class="table table-light table-striped text-dark budgetsTable text-center">
                 <thead class="table-head tableRow">
                     <th class="tableItem">Delete</th>
                     <th class="tableItem">Budget Name</th>
-                    <th class="tableItem">Remaining Balance</th>
+                    <th class="tableItem">Balance</th>
                     <th class="tableItem">Start Date</th>
                     <th class="tableItem">End Date</th>
                     <th class="tableItem" id="logpmt">Log Payment</th>
-                    <th class="tableItem">Additional Details</th>
+                    <th class="tableItem">Details</th>
                 </thead>
                 {%for one_budget in all_budgets %}
                 <tbody>
                     <tr class="tableRow">
                         <form action="/delete" method="post">
-                            <td><input type="hidden" name="budget_id" value="{{one_budget['id']}}"><input type="submit" value="delete" class="btn btn-danger btn-outline-light"></td>
+                            <td><input type="hidden" name="budget_id" value="{{one_budget['id']}}"><input type="submit" value="X" class="btn btn-danger btn-outline-light"></td>
                         </form>
-                        <td class="tableItem"><h5>{{one_budget['budget_name']}}</h5></td>
+                        <td class="tableItem tableName"><h5>{{one_budget['budget_name']}}</h5></td>
                         <td class="tableItem">${{one_budget['adj_balance']}}</td>
                         <td class="tableItem">{{one_budget['start_date']}}</td>
                         <td class="tableItem">{{one_budget['target_date']}}</td>
                         <td class="tableItem" id="logpmt">
-                                        <form class="form logForm" action="/update_budget" method="post">
-                                            <label for="amount">$</label>
-                                            <input class="form-control m-1 " type="text" name="amount" placeholder="payment">
-                                            <input class=" align-self-center" type="hidden" name="budget_id" value="{{one_budget['id']}}">
-                                            <button class="btn btn-primary " type="submit">Log</button>
-                                        </form>
+                            <form class="form logForm" action="/update_budget" method="post">
+                                <label for="amount">$</label>
+                                <input class="form-control m-1 " type="text" name="amount" placeholder="payment">
+                                <input class=" align-self-center" type="hidden" name="budget_id" value="{{one_budget['id']}}">
+                                <button class="btn btn-primary " type="submit">Log</button>
+                            </form>
                         </td>
                         <td><a href="show/{{one_budget['id']}}" class="btn btn-success btn-outline-light text-light">Info</a></td>
                     </tr>
                 </tbody>
                 {% endfor %}
-                
+            </table>
+        </div>
+    </div>
+    <!-- TABLE ROW START SMALL AND MOBILE SCREEN TABLE -->
+    <div class="row budgetTableRow d-md-none p-0  mt-5">
+        <div class="col-12 pl-0 pr-0">
+            <table class="table table-light table-striped text-dark budgetsTable text-center">
+                <thead class="table-head tableRow">
+                    <th class="tableItem">Delete</th>
+                    <th class="tableItem">Budget Name</th>
+                    <th class="tableItem">Balance</th>
+                    <th class="tableItem" id="logpmt">Log Payment</th>
+                </thead>
+                {%for one_budget in all_budgets %}
+                <tbody>
+                    <tr class="tableRow">
+                        <form action="/delete" method="post">
+                            <td><input type="hidden" name="budget_id" value="{{one_budget['id']}}"><input type="submit" value="X" class="btn btn-danger btn-outline-light"></td>
+                        </form>
+                        <td><a href="show/{{one_budget['id']}}"><p>{{one_budget['budget_name']}}</p></a></td>
+                        <td class="tableItem">${{one_budget['adj_balance']}}</td>
+                        <td class="tableItem" id="logpmtSmall">
+                            <form class="form logForm" action="/update_budget" method="post">
+                                <label for="amount">$</label>
+                                <input class="form-control m-1 " type="text" name="amount" placeholder="payment">
+                                <input class=" align-self-center" type="hidden" name="budget_id" value="{{one_budget['id']}}">
+                                <button class="btn btn-primary " type="submit">Log</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+                {% endfor %}
             </table>
         </div>
     </div>

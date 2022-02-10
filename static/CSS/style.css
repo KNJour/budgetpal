@@ -160,5 +160,8 @@ body {
   overflow: hidden;
 }
 #logpmt {
-  min-width: 200px;
+  min-width: 180px;
+}
+#logpmtSmall {
+  min-width: 150px;
 }
