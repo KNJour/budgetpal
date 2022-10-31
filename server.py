@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, flash
+from flask import Flask, render_template, request, redirect, session, flash, json
 from datetime import datetime
 from datetime import date
 from mysqlconnection import connectToMySQL
@@ -300,8 +300,7 @@ def show(budget_id):
 
     budgets = connectToMySQL('budgets').query_db(query,data)
     spending = connectToMySQL('budgets').query_db(spending_query, data)
-    print("SPENDING CHECK")
-    print(spending)
+
 
 
     percentRemaining = round(int(budgets[0]['adj_balance']) / int(budgets[0]['balance']) * 100, 2)
@@ -313,16 +312,14 @@ def show(budget_id):
     duration = date_difference(date2, date1)
     currentDiff = date_difference(date3, date1)
 
-    print(duration)
-    print(currentDiff)
     dateRemaining = round(currentDiff / duration * 100, 2)
     dateRemaining = 100 - dateRemaining
-    print(dateRemaining)
-
+    
     if percentRemaining >= dateRemaining:
         status = "Good job! You are on track!"
     else:
         status = "You are not on track"
+
     return render_template("show.html", budgets = budgets, percentRemaining = percentRemaining, dateRemaining = dateRemaining, status = status, spending = spending)
 
 #DELETE BUDGET

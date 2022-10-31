@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">  
+    <script src="https://d3js.org/d3.v4.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ url_for('static', filename='CSS/style.css')}}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,6 +30,11 @@
       </nav>
       <!-- NAVBAR END -->
       <div class="container-fluid mb-2">
+        <div class="row">
+          <div id="lineGraph" class="lineGraph">
+
+          </div>
+        </div>
           <div class="row">
                 <div class="col-12 text-white justify-content-center blue-background">
                   <h2>Additional Details</h2>
@@ -76,8 +82,148 @@
             <div class="col-3">
             </div>
           </div>
-      </div>
+        <div class="svg-div">
+          <input type="submit" />
+          <script>
+            // amount and timestamp
+            const budgetInfo = JSON.parse('{{budgets | tojson | safe}}');
+            const graphData = JSON.parse('{{spending | tojson | safe}}');
+            const graphTest = '{{spending}}'
+            const jsonData = JSON.stringify(graphData);
+            console.log("JSON? " + jsonData)
 
+            const testData = [
+              {"month":10, "sales":20},
+              {"month":20, "sales":14},
+              {"month":30, "sales":25},
+              {"month":40, "sales":13},
+              {"month":50, "sales":20},
+              {"month":60, "sales":22},
+              {"month":70, "sales":9},
+              {"month":80, "sales":28},
+              {"month":90, "sales":32},
+              {"month":100, "sales":40}
+            ];
+      
+
+            // CSV TEST
+            function convertToCSV(arr) {
+            const array = [Object.keys(arr[0])].concat(arr)
+
+              return array.map(it => {
+                return Object.values(it).toString()
+              }).join('\n')
+            }
+            const csvData = convertToCSV(graphData);
+            
+            
+
+            // console.log("the graphdata" + graphData);
+            // console.log("the budget" + budgetInfo);
+            const width = 550;
+            const height = 500;
+            const margin = {
+              top: 20,
+              right: 20,
+              left: 120,
+              bottom: 60
+            };
+            const innerHeight = height - margin.top - margin.bottom;
+            const innerWidth = width - margin.left - margin.right;
+            
+            const xValue  = d => d.timestamp;
+            const yValue = d => d.amount;
+            const parseTime = d3.timeParse("%a, %d %b %Y %H:%M:%S GMT");
+            const formatTime = d3.timeFormat("%d %b %Y %H:%M:%S");
+            const title = budgetInfo[0]['budget_name'];
+            const budgetTotal = +budgetInfo[0]['balance'];
+            const xLabel = "Payment Date"
+            const yLabel = "Amount Spent";
+            const target = parseTime(budgetInfo[0]['target_date']);
+            const date = parseTime('Mon, 04 jul 2022 15:59:14 GMT');
+
+            console.log(formatTime(date));
+
+            // , 04 Jul 2022 15:59:11 GMT
+            console.log(date);
+           
+            console.log(csvData);
+
+            console.log(parseTime(graphData[0]['timestamp']))
+          
+          for(let i=0;i < graphData.length;i++) {
+            console.log("amount: " + graphData[i]['amount'] + " Time: " + graphData[i]['timestamp'])
+
+          }
+
+          var line = d3.svg.line()
+          .x(function(d){return d.month})
+          .x(function(d){return h-d.sales})
+          .interpolate("linear");
+
+
+              const svg = d3.select("#lineGraph")
+              .append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom)
+              .append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+              // const path = svg.append("path").attr({d.line(jsonData, "fill":"none", "stroke":"blue")})
+
+            // .row(function(d) { return { date:parseDate(d.timestamp), amount:+d.amount};})
+            // .get(function(error, data) {
+
+
+  //           d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/3_TwoNumOrdered_comma.csv",
+
+  // // When reading the csv, I must format variables:
+  //             function(d){
+  //               return { date : d3.timeParse("%Y-%m-%d")(d.date), value : d.value }
+  //             },
+
+  //             // Now I can use this dataset:
+  //             function(data) {
+
+  //               // Add X axis --> it is a date format
+  //               var x = d3.scaleTime()
+  //                 .domain(d3.extent(data, function(d) { return d.date; }))
+  //                 .range([ 0, width ]);
+  //               svg.append("g")
+  //                 .attr("transform", "translate(0," + height + ")")
+  //                 .call(d3.axisBottom(x));
+
+  //               // Add Y axis
+  //               var y = d3.scaleLinear()
+  //                 .domain([0, d3.max(data, function(d) { return +d.value; })])
+  //                 .range([ height, 0 ]);
+  //               svg.append("g")
+  //                 .call(d3.axisLeft(y));
+
+  //               // Add the line
+  //               svg.append("path")
+  //                 .datum(data)
+  //                 .attr("fill", "none")
+  //                 .attr("stroke", "steelblue")
+  //                 .attr("stroke-width", 1.5)
+  //                 .attr("d", d3.line()
+  //                   .x(function(d) { return x(d.date) })
+  //                   .y(function(d) { return y(d.value) })
+  //                   )
+
+  //           })
+            console.log(xValue, yValue)
+
+          
+            
+            // SVG
+
+       console.log(d3.json(graphData));
+
+  // When reading the csv, I must format variables:
+  
+
+
+          </script>
+      </div>
+      
 
       <script src="{{ url_for('static', filename='scripts/script.js')}}"></script>
 </body>
